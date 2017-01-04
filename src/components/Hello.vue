@@ -1,38 +1,80 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-      <br>
-      <li><a href="http://vuejs-templates.github.io/webpack/" target="_blank">Docs for This Template</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
-  </div>
+    <div class="hello">
+        <button type="button"
+                :disabled="!preAvailable"
+                class="btn btn-success"
+                @click="preState">pre</button>
+        <button type="button"
+                :disabled="!postAvailable"
+                class="btn btn-success"
+                @click="postState">post</button>
+        <input type="text"
+               class="form-control"
+               id="exampleInput"
+               placeholder="Enter text here"
+               @keydown="enterEvent"
+               :value="message.data">
+        <span class="help-block">Enter same massage then you can undo or redo your input.</span>
+    </div>
 </template>
 
 <script>
+import {
+    mapActions,
+    mapGetters,
+} from 'vuex';
 export default {
-  name: 'hello',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+    name: 'hello',
+    props: {
+        message: Object
+    },
+    computed: {
+        ...mapGetters([
+            'preAvailable',
+            'postAvailable'
+        ])
+    },
+    methods: {
+        ...mapActions([
+            "enterMessage",
+            'undo',
+            'redo'
+        ]),
+        preState() {
+            if (this.preAvailable) {
+                this.undo();
+            }
+        },
+        postState() {
+            if (this.postAvailable) {
+                this.redo();
+            }
+        },
+        enterEvent: function(e) {
+	        let theEvent = e || window.event;
+	        let code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+	        if (code == 13) {
+	            //enter key down event
+	            theEvent.returnValue = false;
+	            this.enterMessage({
+	                data: $('#exampleInput').val()
+	            })
+	            this.num ++;
+            }
+        }
+    },
+    data () {
+        return {
+            num: 0
+        }
     }
-  }
 }
+
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 h1, h2 {
   font-weight: normal;
 }
@@ -50,4 +92,6 @@ li {
 a {
   color: #42b983;
 }
+
+
 </style>

@@ -1,18 +1,26 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <hello></hello>
+    <hello :message="message"></hello>
   </div>
 </template>
 
 <script>
 import Hello from './components/Hello'
+import {
+    mapGetters,
+    mapActions
+} from 'vuex';
 
 export default {
-  name: 'app',
-  components: {
-    Hello
-  }
+    name: 'app',
+    components: {
+        Hello
+    },
+    computed: {
+        ...mapGetters([
+            "message"
+        ]),
+    }
 }
 </script>
 
