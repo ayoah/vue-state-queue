@@ -3,12 +3,14 @@ import Vuex from 'vuex'
 import * as getters from './getters'
 import * as actions from './actions'
 import mutations from './mutations'
+import { diffUtil } from '../util'
 
 Vue.use(Vuex)
 
 const state = {
     message: {
-        data:''
+        data:'',
+        $data:''
     },
     snapShots: [],
     preState: false,
@@ -16,19 +18,16 @@ const state = {
 }
 
 const snapshot = store => {
-    state.preState = _.cloneDeep(state.message)
-    store.subscribe((mutation, state) => {
-        let jsondiffpatch = require('jsondiffpatch').create({
-            propertyFilter: function(name, context) {
-                return name.slice(0, 1) !== '$';
-            }
-        });
-        let currentState = _.cloneDeep(state.message); //深拷贝当前状态
-        if (state.preState) {
-            let preState = _.cloneDeep(state.preState); //深拷贝前一次状态
-            let delta = jsondiffpatch.diff(currentState,preState); //diff delta
 
-            if (delta !== undefined) { //如果有差异
+    state.preState = _.cloneDeep(state.message)
+
+    store.subscribe((mutation, state) => {
+        let currentState = _.cloneDeep(state.message); //deep clone state
+        if (state.preState) {
+            let preState = _.cloneDeep(state.preState); //deep clone preState
+            let delta = diffUtil.diff(currentState,preState); //diff delta
+
+            if (delta !== undefined) { //if has diff
 
                 if (state.preState && mutation.type !== 'UNDO' && mutation.type !== 'REDO') {
 
@@ -39,7 +38,7 @@ const snapshot = store => {
                     }
                     state.snapShots.push(delta);
                 }
-                state.preState = currentState; //把当前的状态拷贝到preState状态中
+                state.preState = currentState; //copy current state to preState for next diff
             }
 
         }

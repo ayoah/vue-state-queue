@@ -14,6 +14,12 @@
                placeholder="Enter text here"
                @keydown="enterEvent"
                :value="message.data">
+        <input type="text"
+               class="form-control"
+               id="exampleIgnoreInput"
+               placeholder="Enter text here but can`t undo"
+               @keydown="enterEvent"
+               :value="message.$data">
         <span class="help-block">Enter same massage then you can undo or redo your input.</span>
     </div>
 </template>
@@ -57,7 +63,8 @@ export default {
 	            //enter key down event
 	            theEvent.returnValue = false;
 	            this.enterMessage({
-	                data: $('#exampleInput').val()
+	                data: $('#exampleInput').val(),
+	                $data: $('#exampleIgnoreInput').val(),
 	            })
 	            this.num ++;
             }
